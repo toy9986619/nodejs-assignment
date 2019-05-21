@@ -135,7 +135,7 @@ export default {
         })
         .then(res => {
           console.log(res);
-          this.$emit("update", this.index, this.eventData);
+          this.$emit("update");
           this.$emit("close");
         })
         .catch(err => {
@@ -152,7 +152,7 @@ export default {
         })
         .then(res => {
           console.log(res);
-          this.$emit("update", this.index, this.eventData);
+          this.$emit("update");
           this.$emit("close");
         })
         .catch(err => {

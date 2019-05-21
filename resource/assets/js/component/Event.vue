@@ -3,6 +3,7 @@
     <span
       @click="showDetailModal = true"
     >{{ event.summary }} {{ event.start.dateTime || event.start.date }}</span>
+    <button @click="deleteEvent">刪除</button>
 
     <event-form
       v-if="showDetailModal"
@@ -34,10 +35,20 @@ export default {
   },
 
   methods: {
-    updateEventItem(index, event) {
-      console.log("hihi");
-      console.log(event);
-      this.$emit("update", index, event);
+    updateEventItem() {
+      this.$emit("update");
+    },
+
+    deleteEvent() {
+      axios
+        .delete(`/api/calendar/event/${this.event.id}`)
+        .then(res => {
+          console.log("deleted complete");
+          this.$emit("update");
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };

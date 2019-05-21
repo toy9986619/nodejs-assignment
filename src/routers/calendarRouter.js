@@ -104,6 +104,21 @@ router.post(
     )
   });
 
+router.delete("/event/:eventId", (req, res) => {
+  calendar.events.delete({
+    calendarId: "primary", 
+    eventId: req.params.eventId
+  }, (err, response) => {
+    if (err) {
+      console.log("The API returned an error: " + err);
+      return res.status(400).send({ message: err });
+    }
+
+    console.log(`eventId ${req.params.eventId} deleted.`);
+    res.status(204).send();
+  })
+});
+
 router.get("/event/sync", asyncHandler(async (req, res, next) => {
   let syncToken = req.params.syncToken || "";
   console.log(syncToken);

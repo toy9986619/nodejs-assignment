@@ -80,22 +80,6 @@ export default {
           .catch(err => {
             console.log(err);
           });
-
-        // try {
-        //   const res = await axios.get("/api/calendar/", {
-        //     params: {
-        //       syncToken: this.syncToken
-        //     }
-        //   });
-        //   const { data } = await res.data;
-        //   if (data.events) {
-        //     this.eventList = data.events;
-        //   }
-
-        //   this.syncToken = data.syncToken;
-        // } catch (err) {
-        //   console.log(err);
-        // }
       }
     },
 
@@ -112,11 +96,8 @@ export default {
       return `${year}-${month}-${date}`;
     },
 
-    updateEventItem(index, event) {
+    updateEventItem() {
       console.log("handle");
-      // console.log(index);
-      // console.log(event);
-      // this.eventList.splice(index, 1, event);
       this.getCalendarList();
     }
   },
