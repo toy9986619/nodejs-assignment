@@ -75,7 +75,8 @@ export default {
 
   props: {
     event: Object,
-    createMode: Boolean
+    createMode: Boolean,
+    index: Number
   },
 
   data() {
@@ -97,7 +98,8 @@ export default {
         : this.event.start.date,
       endDate: this.event.end.dateTime
         ? this.parseEventToDate(this.event.end.dateTime)
-        : `${this.event.end.date.slice(0, 8)}${this.event.end.date.slice(8) -1 }`,
+        : `${this.event.end.date.slice(0, 8)}${this.event.end.date.slice(8) -
+            1}`,
       allDay: this.event.start.date ? true : false
     };
   },
@@ -112,23 +114,29 @@ export default {
     },
 
     startDate(value) {
-      this.startTime = `${value} ${this.startTime.slice(11, this.startTime.length)}`;
+      this.startTime = `${value} ${this.startTime.slice(
+        11,
+        this.startTime.length
+      )}`;
     },
 
     endDate(value) {
       this.endTime = `${value} ${this.endTime.slice(11, this.endTime.length)}`;
     }
-
   },
 
   methods: {
     async updateEvent() {
+      this.parseTimeToEvent();
+
       axios
-        .patch(`/api/calendar/event/${this.eventData.id}`, {
+        .put(`/api/calendar/event/${this.eventData.id}`, {
           event: this.eventData
         })
         .then(res => {
           console.log(res);
+          this.$emit("update", this.index, this.eventData);
+          this.$emit("close");
         })
         .catch(err => {
           console.log(err);
@@ -136,21 +144,16 @@ export default {
     },
 
     async insertEvent() {
-      if (this.allDay) {
-        this.eventData.start = {
-          date: this.startDate
-        };
-        this.eventData.end = {
-          date: this.endDate
-        }
-      }
-      
+      this.parseTimeToEvent();
+
       axios
         .post(`/api/calendar/event`, {
           event: this.eventData
         })
         .then(res => {
           console.log(res);
+          this.$emit("update", this.index, this.eventData);
+          this.$emit("close");
         })
         .catch(err => {
           console.log(err);
@@ -178,6 +181,32 @@ export default {
       }
 
       return "00:00:00";
+    },
+
+    parseTimeToEvent() {
+      if (this.allDay) {
+        this.eventData.start = {
+          date: this.startDate
+        };
+        this.eventData.end = {
+          date: this.endDate
+        };
+      } else {
+        const startTime = `${this.startTime.slice(
+          0,
+          10
+        )}T${this.startTime.slice(11)}+08:00`;
+        const endTime = `${this.endTime.slice(0, 10)}T${this.endTime.slice(
+          11
+        )}+08:00`;
+
+        this.eventData.start = {
+          dateTime: startTime
+        };
+        this.eventData.end = {
+          dateTime: endTime
+        };
+      }
     }
   }
 };

@@ -6,16 +6,18 @@
 
     <div v-if="eventList">
       <button v-if="username" @click="showInsertModal = true">新增</button>
+      <button @click="getCalendarList">更新</button>
       <event-form
         v-if="showInsertModal"
         @close="showInsertModal = false"
+        @update="updateEventItem"
         :event="newEvent"
         :createMode="true"
       />
 
       <ul>
-        <li v-for="event in eventList" :key="event.id">
-          <event :event="event" :key="event.id"/>
+        <li v-for="(event, index) in eventList" :key="event.id">
+          <event :event="event" :index="index" @update="updateEventItem"/>
         </li>
       </ul>
     </div>
@@ -38,6 +40,7 @@ export default {
       username: "",
       showInsertModal: false,
       eventList: [],
+      syncToken: "",
       newEvent: {
         start: {
           date: this.getNowDate()
@@ -62,17 +65,37 @@ export default {
       }
     },
 
-    async getCalanderList() {
+    async getCalendarList() {
       if (this.username) {
-        try {
-          const res = await fetch("/api/calendar/");
-          const data = await res.json();
-          if (data.events) {
-            this.eventList = data.events;
-          }
-        } catch (err) {
-          console.log(err);
-        }
+        console.log("getCalendarList");
+        axios
+          .get("/api/calendar/")
+          .then(res => {
+            const data = res.data;
+
+            if (data.events) {
+              this.eventList = data.events;
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+        // try {
+        //   const res = await axios.get("/api/calendar/", {
+        //     params: {
+        //       syncToken: this.syncToken
+        //     }
+        //   });
+        //   const { data } = await res.data;
+        //   if (data.events) {
+        //     this.eventList = data.events;
+        //   }
+
+        //   this.syncToken = data.syncToken;
+        // } catch (err) {
+        //   console.log(err);
+        // }
       }
     },
 
@@ -82,30 +105,25 @@ export default {
       let month = time.getMonth() + 1;
       let date = time.getDate();
 
-      if (month < 10)
-        month = `0${month}`;
-      
-      if (date < 10)
-        date = `0${date}`;
+      if (month < 10) month = `0${month}`;
+
+      if (date < 10) date = `0${date}`;
 
       return `${year}-${month}-${date}`;
+    },
+
+    updateEventItem(index, event) {
+      console.log("handle");
+      // console.log(index);
+      // console.log(event);
+      // this.eventList.splice(index, 1, event);
+      this.getCalendarList();
     }
-
-    // async getEventDetails(eventId) {
-    //   try {
-    //     const res = await fetch(`/api/calendar/event/${eventId}`);
-    //     const data = await res.json();
-
-    //     console.log(data);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }
   },
 
   async mounted() {
     await this.getLoginUser();
-    await this.getCalanderList();
+    await this.getCalendarList();
   }
 };
 </script>

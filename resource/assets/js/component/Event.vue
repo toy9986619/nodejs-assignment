@@ -4,7 +4,13 @@
       @click="showDetailModal = true"
     >{{ event.summary }} {{ event.start.dateTime || event.start.date }}</span>
 
-    <event-form v-if="showDetailModal" @close="showDetailModal = false" :event="event"/>
+    <event-form
+      v-if="showDetailModal"
+      @close="showDetailModal = false"
+      @update="updateEventItem"
+      :event="event"
+      :index="index"
+    />
   </div>
 </template>
 
@@ -17,13 +23,22 @@ export default {
   },
 
   props: {
-    event: Object
+    event: Object,
+    index: Number
   },
 
   data() {
     return {
       showDetailModal: false
     };
+  },
+
+  methods: {
+    updateEventItem(index, event) {
+      console.log("hihi");
+      console.log(event);
+      this.$emit("update", index, event);
+    }
   }
 };
 </script>
