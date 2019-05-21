@@ -25,13 +25,8 @@ router.get(
           events.map((event, i) => {
             const start = event.start.dateTime || event.start.date;
             console.log(`${start} - ${event.summary}`);
-
-            // console.log(`${i} - ${JSON.stringify(event)}`);
           });
 
-          // fs.writeFile('calander_json.json', JSON.stringify(events, null, 2), 'utf8', (err) => {
-          //   if(err) console.log(err)
-          // });
           res.status(200).send({ message: "ok", events: events });
         } else {
           console.log("No upcoming events found.");
@@ -71,6 +66,7 @@ router.patch(
       (err, response) => {
         if (err) return console.log("The API returned an error: " + err);
 
+        console.log(`eventID: ${eventId} Patch.`);
         res.status(200).send({ message: "ok", event: response.data });
       }
     );
@@ -80,14 +76,16 @@ router.patch(
 router.post(
   "/event",
   asyncHandler(async (req, res, next) => {
-    calendar.events.post(
+    calendar.events.insert(
       {
         calendarId: "primary",
         resource: req.body.event
       },
       (err, response) => {
         if (err) return console.log("The API returned an error: " + err);
-
+        
+        console.log("event insert.");
+        console.log(response.data);
         res.status(200).send({ message: "ok", event: response.data });
       }
     )
