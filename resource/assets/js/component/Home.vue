@@ -5,10 +5,17 @@
     <p v-else>尚未登入</p>
 
     <div v-if="eventList">
+      <button v-if="username" @click="showInsertModal = true">新增</button>
+      <event-form
+        v-if="showInsertModal"
+        @close="showInsertModal = false"
+        :event="newEvent"
+        :createMode="true"
+      />
+
       <ul>
         <li v-for="event in eventList" :key="event.id">
-          <!-- {{ event.summary }} {{ event.start.dateTime || event.start.date }} -->
-          <event :event="event" />
+          <event :event="event" :key="event.id"/>
         </li>
       </ul>
     </div>
@@ -17,17 +24,28 @@
 </template>
 
 <script>
-import event from "./Event.vue";
+import Event from "./Event.vue";
+import EventForm from "./EventForm.vue";
 
 export default {
   components: {
-    event
+    Event,
+    EventForm
   },
-  
+
   data() {
     return {
       username: "",
-      eventList: []
+      showInsertModal: false,
+      eventList: [],
+      newEvent: {
+        start: {
+          date: this.getNowDate()
+        },
+        end: {
+          date: this.getNowDate()
+        }
+      }
     };
   },
 
@@ -57,6 +75,21 @@ export default {
         }
       }
     },
+
+    getNowDate() {
+      const time = new Date(Date.now());
+      let year = time.getFullYear();
+      let month = time.getMonth() + 1;
+      let date = time.getDate();
+
+      if (month < 10)
+        month = `0${month}`;
+      
+      if (date < 10)
+        date = `0${date}`;
+
+      return `${year}-${month}-${date}`;
+    }
 
     // async getEventDetails(eventId) {
     //   try {

@@ -19,7 +19,7 @@
 
     <div slot="body" v-if="editMode">
       <div class="option">
-        <button class="modal-default-button" @click="editMode = false">返回</button>
+        <button class="modal-default-button" v-if="!createMode" @click="editMode = false">返回</button>
       </div>
 
       <div class="form-container">
@@ -28,9 +28,17 @@
           <input v-model="eventData.summary">
         </div>
         <div>
-          <span>時間:</span>
-          <input v-if="eventData.start.date" v-model="eventData.start.date">
-          <input v-if="eventData.start.dateTime" v-model="eventData.start.dateTime">
+          <span>時間</span>
+          <div>
+            <label>整天</label>
+            <input type="checkbox" v-model="allDay">
+          </div>
+          <div>開始</div>
+          <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="startDate" key="startDate"/>
+          <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="startTime" key="startTime"/>
+          <div>結束</div>
+          <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="endDate" key="endDate"/>
+          <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="endTime" key="endTime"/>
         </div>
         <div>
           <span>地點:</span>
@@ -48,18 +56,21 @@
     </div>
 
     <div slot="footer" v-if="editMode">
-      <button class="modal-default-button" @click="updateEvent()">保存</button>
+      <button class="modal-default-button" v-if="createMode == false" @click="updateEvent()">保存</button>
+      <button class="modal-default-button" v-if="createMode == true" @click="insertEvent()">新增</button>
       <button class="modal-default-button" @click="$emit('close')">取消</button>
     </div>
   </modal>
 </template>
 
 <script>
-import modal from "./Modal.vue";
+import Modal from "./Modal.vue";
+import Datepicker from "vuejs-datetimepicker";
 
 export default {
   components: {
-    modal
+    Modal,
+    Datepicker
   },
 
   props: {
@@ -69,9 +80,45 @@ export default {
 
   data() {
     return {
-      editMode: false,
-      eventData: Object.assign({}, this.event)
+      editMode: this.createMode | false,
+      eventData: Object.assign({}, this.event),
+      startTime: this.event.start.dateTime
+        ? `${this.parseEventToDate(
+            this.event.start.dateTime
+          )} ${this.parseEventToTime(this.event.start.dateTime)}`
+        : `${this.event.start.date} 00:00:00`,
+      endTime: this.event.end.dateTime
+        ? `${this.parseEventToDate(
+            this.event.end.dateTime
+          )} ${this.parseEventToTime(this.event.end.dateTime)}`
+        : `${this.event.end.date} 00:00:00`,
+      startDate: this.event.start.dateTime
+        ? this.parseEventToDate(this.event.start.dateTime)
+        : this.event.start.date,
+      endDate: this.event.end.dateTime
+        ? this.parseEventToDate(this.event.end.dateTime)
+        : `${this.event.end.date.slice(0, 8)}${this.event.end.date.slice(8) -1 }`,
+      allDay: this.event.start.date ? true : false
     };
+  },
+
+  watch: {
+    startTime(value) {
+      this.startDate = value.slice(0, 10);
+    },
+
+    endTime(value) {
+      this.endDate = value.slice(0, 10);
+    },
+
+    startDate(value) {
+      this.startTime = `${value} ${this.startTime.slice(11, this.startTime.length)}`;
+    },
+
+    endDate(value) {
+      this.endTime = `${value} ${this.endTime.slice(11, this.endTime.length)}`;
+    }
+
   },
 
   methods: {
@@ -89,20 +136,49 @@ export default {
     },
 
     async insertEvent() {
-      axios.post(`/api/calendar/event`, {
-
-      })
+      if (this.allDay) {
+        this.eventData.start = {
+          date: this.startDate
+        };
+        this.eventData.end = {
+          date: this.endDate
+        }
+      }
+      
+      axios
+        .post(`/api/calendar/event`, {
+          event: this.eventData
+        })
         .then(res => {
           console.log(res);
         })
         .catch(err => {
           console.log(err);
-        })
-    }
-  },
+        });
+    },
 
-  mounted() {
-    // this.eventData = this.event;
+    parseEventToDate(eventTime) {
+      if (eventTime.includes("T")) {
+        const date = eventTime.slice(0, eventTime.indexOf("T"));
+
+        return date;
+      }
+
+      return eventTime;
+    },
+
+    parseEventToTime(eventTime) {
+      if (eventTime.includes("T")) {
+        const time = eventTime.slice(
+          eventTime.indexOf("T") + 1,
+          eventTime.indexOf("+08:00")
+        );
+
+        return time;
+      }
+
+      return "00:00:00";
+    }
   }
 };
 </script>
