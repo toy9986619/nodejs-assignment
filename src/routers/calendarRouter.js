@@ -27,12 +27,7 @@ router.get(
 
         const events = response.data.items;
         if (events.length) {
-          console.log("Upcoming 10 events:");
-          events.map((event, i) => {
-            const start = event.start.dateTime || event.start.date;
-            console.log(`${start} - ${event.summary}`);
-          });
-
+          
           res.status(200).send({ message: "ok", events: events});
         } else {
           console.log("No upcoming events found.");

@@ -2,8 +2,6 @@ const express = require("express");
 const { google } = require("googleapis");
 const fetch = require("node-fetch");
 const asyncHandler = require("../utils/asyncRouterHandler");
-const credentials = require("../../credentials.json");
-const { client_secret, client_id } = credentials.installed;
 const REDIRECT_URL = "http://localhost:9999/api/auth/google_oauth_redirect";
 
 const router = express.Router();
@@ -14,9 +12,11 @@ const SCOPES = [
   "https://www.googleapis.com/auth/userinfo.profile"
 ];
 
+console.log(`client_id: ${process.env.CLIENT_ID}`);
+
 const oAuth2Client = new google.auth.OAuth2(
-  client_id,
-  client_secret,
+  process.env.CLIENT_ID,
+  process.env.CLIENT_SECRET,
   REDIRECT_URL
 );
 
