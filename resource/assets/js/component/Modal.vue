@@ -36,18 +36,17 @@ export default {};
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: table;
+  display: flex;
   transition: opacity 0.3s ease;
 }
 
 .modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
+  display: flex;
+  margin: auto;
 }
 
 .modal-container {
   width: 700px;
-  margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 2px;
@@ -63,6 +62,7 @@ export default {};
 
 .modal-body {
   margin: 20px 0;
+  overflow-y: auto;
 }
 
 .modal-default-button {

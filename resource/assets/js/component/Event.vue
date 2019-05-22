@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="item-container">
     <span
       @click="showDetailModal = true"
     >{{ event.summary }} {{ event.start.dateTime || event.start.date }}</span>
@@ -55,4 +55,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.item-container {
+  display: flex;
+  
+  > button {
+    margin-right: 30px;
+    margin-left: auto;
+  }
+}
 </style>
