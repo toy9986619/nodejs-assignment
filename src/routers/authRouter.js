@@ -1,5 +1,6 @@
 const express = require("express");
 const { google } = require("googleapis");
+const fetch = require("node-fetch");
 const asyncHandler = require("../utils/asyncRouterHandler");
 const credentials = require("../../credentials.json");
 const { client_secret, client_id } = credentials.installed;
@@ -34,21 +35,26 @@ router.get(
 router.get(
   "/google_oauth_redirect",
   asyncHandler(async (req, res, next) => {
-    // console.log(req.query.code);
     const code = req.query.code;
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
-    req.session.username = "testing";
-    // console.log(tokens);
-
     google.options({ auth: oAuth2Client });
-    console.log("ok!");
 
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`
+      }
+    });
+    const data = await response.json();
+    req.session.username = data.name;
+    req.session.email = data.email;
+
+    console.log("ok!");
     res.redirect("/");
   })
 );
 
-router.get(
+router.post(
   "/logout",
   asyncHandler(async (req, res, next) => {
     req.session.destroy();
