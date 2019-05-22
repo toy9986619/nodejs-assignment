@@ -6,7 +6,7 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
         <ul class="navbar-nav">
           <li v-if="!isLogin" class="nav-item">
-            <a href="/api/auth/login" class="nav-link">Login</a>
+            <a href="/api/auth/login" class="nav-link" key="login">Login</a>
           </li>
           <li v-else class="nav-item dropdown">
             <a
@@ -18,7 +18,7 @@
               aria-expanded="false"
             >{{username}}</a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-              <a href="/#" class="dropdown-item" @click.stop.prevent="logout()">Logout</a>
+              <a href="#" class="dropdown-item" @click.stop.prevent="logout()">Logout</a>
             </div>
           </li>
         </ul>
@@ -62,7 +62,6 @@ export default {
       axios.post("/api/auth/logout")
       .then(res => {
         this.$store.commit("logout");
-        this.eventList = [];
       }).catch(err => {
         console.log(err);
       });
