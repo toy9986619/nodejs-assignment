@@ -2,29 +2,34 @@
   <div class="container">
     <div class="row justify-content-md-center mt-5">
       <div class="col-md-8">
-        <div v-if="eventList">
-          <div class="card">
-            <div class="card-header">
-              <span>最近 20 筆待辦事項</span>
-              <div class="botton-menu">
-                <button v-if="username" @click="showInsertModal = true">新增</button>
-                <button @click="getCalendarList">更新</button>
-              </div>
-              <event-form
-                v-if="showInsertModal"
-                @close="showInsertModal = false"
-                @update="updateEventItem"
-                :event="newEvent"
-                :createMode="true"
-              />
+        <div class="card" v-if="isLogin">
+          <div class="card-header">
+            <span>最近 20 筆待辦事項</span>
+            <div class="botton-menu">
+              <button v-if="username" @click="showInsertModal = true">新增</button>
+              <button @click="getCalendarList">更新</button>
             </div>
-            <div class="card-body">
-              <ul class="item-list">
-                <li v-for="(event, index) in eventList" :key="event.id">
-                  <event :event="event" :index="index" @update="updateEventItem"/>
-                </li>
-              </ul>
-            </div>
+            <event-form
+              v-if="showInsertModal"
+              @close="showInsertModal = false"
+              @update="updateEventItem"
+              :event="newEvent"
+              :createMode="true"
+            />
+          </div>
+          <div class="card-body">
+            <ul class="item-list">
+              <li v-for="(event, index) in eventList" :key="event.id">
+                <event :event="event" :index="index" @update="updateEventItem"/>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" v-else>
+          <div class="card-header">尚未登入</div>
+          <div class="card-body">
+            請先進行登入，獲取待辦事項內容
           </div>
         </div>
       </div>
@@ -61,6 +66,10 @@ export default {
   computed: {
     username() {
       return this.$store.state.user;
+    },
+    
+    isLogin() {
+      return this.$store.state.isLogin;
     }
   },
 
@@ -129,7 +138,7 @@ export default {
 .botton-menu {
   margin-right: 20px;
   margin-left: auto;
-  
+
   > button {
     margin-right: 10px;
   }
@@ -138,9 +147,9 @@ export default {
 .item-list {
   padding-inline-start: 0px;
   list-style: none;
-  
+
   > li:hover {
-    background-color: rgba(0,0,0,.03);
+    background-color: rgba(0, 0, 0, 0.03);
   }
 }
 </style>
