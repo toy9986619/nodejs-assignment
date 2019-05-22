@@ -1,13 +1,21 @@
 <template>
   <div class="item-container">
-    <span
-      @click="showDetailModal = true"
-    >{{ event.summary }} {{ event.start.dateTime || event.start.date }}</span>
-    <button @click="deleteEvent">刪除</button>
+    <div class="item-content" @click="showDetailModal = true">
+      <span>{{ event.summary }}</span>
+      <span>{{ eventTime }}</span>
+    </div>
+    <button @click="showDeleteModal = true">刪除</button>
 
     <event-form
       v-if="showDetailModal"
       @close="showDetailModal = false"
+      @update="updateEventItem"
+      :event="event"
+      :index="index"
+    />
+    <delete-event-form
+      v-if="showDeleteModal"
+      @close="showDeleteModal = false"
       @update="updateEventItem"
       :event="event"
       :index="index"
@@ -17,10 +25,12 @@
 
 <script>
 import EventForm from "./EventForm.vue";
+import DeleteEventForm from "./DeleteEventForm.vue";
 
 export default {
   components: {
-    EventForm
+    EventForm,
+    DeleteEventForm
   },
 
   props: {
@@ -30,25 +40,25 @@ export default {
 
   data() {
     return {
-      showDetailModal: false
+      showDetailModal: false,
+      showDeleteModal: false
     };
+  },
+
+  computed: {
+    eventTime() {
+      const dateTime = this.event.start.dateTime;
+      if(dateTime){
+        return dateTime.slice(0, dateTime.indexOf("T"));
+      }
+
+      return this.event.start.date;
+    }
   },
 
   methods: {
     updateEventItem() {
       this.$emit("update");
-    },
-
-    deleteEvent() {
-      axios
-        .delete(`/api/calendar/event/${this.event.id}`)
-        .then(res => {
-          console.log("deleted complete");
-          this.$emit("update");
-        })
-        .catch(err => {
-          console.log(err);
-        });
     }
   }
 };
@@ -57,10 +67,22 @@ export default {
 <style lang="scss" scoped>
 .item-container {
   display: flex;
-  
+
   > button {
     margin-right: 30px;
     margin-left: auto;
+  }
+}
+
+.item-content{
+  display: flex;
+  width: 500px;
+
+  > span:first-child{
+    width: 80%;
+  }
+  > span:last-child {
+    width: 20%;
   }
 }
 </style>

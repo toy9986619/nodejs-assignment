@@ -1,65 +1,75 @@
 <template>
   <modal>
-    <div slot="header">
-      <h3>詳細資訊</h3>
-    </div>
-
-    <div slot="body" v-if="!editMode">
-      <div class="option">
-        <button class="modal-default-button" @click="editMode = true">編輯</button>
+    <template v-if="!editMode">
+      <div slot="header">
+        <h3>詳細資訊</h3>
       </div>
 
-      <div class="form-container">
-        <div>標題: {{ eventData.summary }}</div>
-        <div>時間: {{ eventData.start.dateTime || eventData.start.date }}</div>
-        <div>地點: {{ eventData.location }}</div>
-        <div>內容: {{ eventData.description }}</div>
-      </div>
-    </div>
-
-    <div slot="body" v-if="editMode">
-      <div class="option">
-        <button class="modal-default-button" v-if="!createMode" @click="editMode = false">返回</button>
-      </div>
-
-      <div class="form-container">
-        <div>
-          <span>標題:</span>
-          <input v-model="eventData.summary">
+      <div slot="body">
+        <div class="option">
+          <button class="modal-default-button" @click="editMode = true">編輯</button>
         </div>
-        <div>
-          <span>時間</span>
-          <div>
-            <label>整天</label>
-            <input type="checkbox" v-model="allDay">
+
+        <div class="form-container">
+          <div class="title">標題: {{ eventData.summary }}</div>
+          <div class="time">時間: {{ eventData.start.dateTime || eventData.start.date }}</div>
+          <div class="location">地點: {{ eventData.location }}</div>
+          <div class="contnet">內容: {{ eventData.description }}</div>
+        </div>
+      </div>
+
+      <div slot="footer">
+        <button class="modal-default-button" @click="$emit('close')">確定</button>
+      </div>
+    </template>
+
+    <template v-else>
+      <div slot="header">
+        <h3>編輯事項</h3>
+      </div>
+
+      <div slot="body">
+        <div class="option">
+          <button class="modal-default-button" v-if="!createMode" @click="editMode = false">返回</button>
+        </div>
+
+        <div class="form-container">
+          <div class="title">
+            <div>標題:</div>
+            <input type="text" v-model="eventData.summary">
           </div>
-          <div>開始</div>
-          <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="startDate" key="startDate"/>
-          <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="startTime" key="startTime"/>
-          <div>結束</div>
-          <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="endDate" key="endDate"/>
-          <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="endTime" key="endTime"/>
-        </div>
-        <div>
-          <span>地點:</span>
-          <input v-model="eventData.location">
-        </div>
-        <div>
-          <span>內容:</span>
-          <textarea v-model="eventData.description"></textarea>
+          <div class="time">
+            <div>
+              <span>時間</span>
+              <span>
+                <span>整天</span>
+                <input type="checkbox" v-model="allDay">
+              </span>
+            </div>
+            <div>開始</div>
+            <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="startDate" key="startDate"/>
+            <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="startTime" key="startTime"/>
+            <div>結束</div>
+            <datepicker v-if="allDay" format="YYYY-MM-DD" v-model="endDate" key="endDate"/>
+            <datepicker v-else format="YYYY-MM-DD H:i:s" v-model="endTime" key="endTime"/>
+          </div>
+          <div class="location">
+            <div>地點:</div>
+            <input type="text" v-model="eventData.location">
+          </div>
+          <div class="content">
+            <div>內容:</div>
+            <textarea v-model="eventData.description"></textarea>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div slot="footer" v-if="!editMode">
-      <button class="modal-default-button" @click="$emit('close')">確定</button>
-    </div>
-
-    <div slot="footer" v-if="editMode">
-      <button class="modal-default-button" v-if="createMode == false" @click="updateEvent()">保存</button>
-      <button class="modal-default-button" v-if="createMode == true" @click="insertEvent()">新增</button>
-      <button class="modal-default-button" @click="$emit('close')">取消</button>
-    </div>
+      <div slot="footer">
+        <button class="modal-default-button" v-if="createMode == false" @click="updateEvent()">保存</button>
+        <button class="modal-default-button" v-if="createMode == true" @click="insertEvent()">新增</button>
+        <button class="modal-default-button" @click="$emit('close')">取消</button>
+      </div>
+    </template>
   </modal>
 </template>
 
@@ -216,4 +226,18 @@ export default {
 .form-container {
   margin-top: 10px;
 }
+
+.title, .time, .location, .content {
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  width: 100%;
+}
+
+textarea {
+  width: 100%;
+}
+
+
 </style>
