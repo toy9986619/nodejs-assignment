@@ -12,14 +12,13 @@ const SCOPES = [
   "https://www.googleapis.com/auth/userinfo.profile"
 ];
 
-console.log(`client_id: ${process.env.CLIENT_ID}`);
-
 const oAuth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
   REDIRECT_URL
 );
 
+// 登入頁面
 router.get(
   "/login",
   asyncHandler(async (req, res, next) => {
@@ -32,6 +31,7 @@ router.get(
   })
 );
 
+// OAuth 2 重新導向後處理登入資訊
 router.get(
   "/google_oauth_redirect",
   asyncHandler(async (req, res, next) => {
@@ -54,6 +54,7 @@ router.get(
   })
 );
 
+// 登出
 router.post(
   "/logout",
   asyncHandler(async (req, res, next) => {
@@ -62,6 +63,7 @@ router.post(
   })
 );
 
+// 確認是否登入
 router.get(
   "/check_login",
   asyncHandler(async (req, res, next) => {

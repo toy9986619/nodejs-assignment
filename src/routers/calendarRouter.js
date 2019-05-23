@@ -3,9 +3,9 @@ const { google } = require("googleapis");
 const asyncHandler = require("../utils/asyncRouterHandler");
 
 const router = express.Router();
-
 const calendar = google.calendar({ version: "v3" });
 
+// events 列表
 router.get(
   "/",
   (req, res) => {
@@ -27,16 +27,18 @@ router.get(
 
         const events = response.data.items;
         if (events.length) {
-          
-          res.status(200).send({ message: "ok", events: events});
+
+          res.status(200).send({ message: "ok", events: events });
         } else {
           console.log("No upcoming events found.");
-          res.status(200).send({ message: "ok", events: []});
+          res.status(200).send({ message: "ok", events: [] });
         }
       }
     );
-  });
+  }
+);
 
+// 利用 eventId 取得 event 詳細資訊
 router.get(
   "/event/:eventId",
   (req, res) => {
@@ -55,8 +57,10 @@ router.get(
         res.status(200).send({ message: "ok", event: data });
       }
     );
-  });
+  }
+);
 
+// event 更新
 router.put(
   "/event/:eventId",
   (req, res) => {
@@ -76,8 +80,10 @@ router.put(
         res.status(200).send({ message: "ok", event: response.data });
       }
     );
-  });
+  }
+);
 
+// 新增 event
 router.post(
   "/event",
   (req, res) => {
@@ -97,11 +103,13 @@ router.post(
         res.status(200).send({ message: "ok", event: response.data });
       }
     )
-  });
+  }
+);
 
+// 刪除 event
 router.delete("/event/:eventId", (req, res) => {
   calendar.events.delete({
-    calendarId: "primary", 
+    calendarId: "primary",
     eventId: req.params.eventId
   }, (err, response) => {
     if (err) {
@@ -114,6 +122,7 @@ router.delete("/event/:eventId", (req, res) => {
   })
 });
 
+// calendar sync
 router.get("/event/sync", asyncHandler(async (req, res, next) => {
   let syncToken = req.params.syncToken || "";
   console.log(syncToken);
@@ -136,6 +145,7 @@ router.get("/event/sync", asyncHandler(async (req, res, next) => {
   })
 }));
 
+// calendar full sync method
 async function fullSync() {
   return new Promise((resolve, reject) => {
     calendar.events.list({ calendarId: "primary" }, (err, response) => {
