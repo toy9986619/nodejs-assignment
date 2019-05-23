@@ -88,7 +88,6 @@ export default {
 
     async getCalendarList() {
       if (this.username) {
-        console.log("getCalendarList");
         axios
           .get("/api/calendar/")
           .then(res => {
