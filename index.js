@@ -8,16 +8,16 @@ const webpackConfig = require('./webpack.config');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 
+// dotenv
+const ENV_FILE = path.join(__dirname, '.env');
+dotenv.config({ path: ENV_FILE });
+
 // router require
 const authRouter = require('./src/routers/authRouter');
 const calendarRouter = require('./src/routers/calendarRouter');
 
 const PORT = 9999;
-const ENV_FILE = path.join(__dirname, '.env');
-
 const app = express();
-
-dotenv.config({ path: ENV_FILE });
 
 // express
 app.use(express.json());
